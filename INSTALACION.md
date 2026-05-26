@@ -1,5 +1,5 @@
-# Guía de instalación — FaceBlur Studio
-### Windows · Python 3.11 o 3.12
+# Guía de instalación — GhostFrame Studio
+### Windows · Python 3.12 recomendado
 
 ---
 
@@ -8,10 +8,29 @@
 | Versión | Estado |
 |---|---|
 | Python 3.14 | No compatible — ningún paquete de IA tiene wheels todavía. |
-| **Python 3.12** | **Compatible y probado.** Funciona con esta guía. |
-| **Python 3.11** | **Compatible.** Opción más segura si tienes problemas con 3.12. |
+| **Python 3.12** | **Compatible y probado. Recomendado.** |
+| **Python 3.11** | Compatible. |
 | Python 3.10 | Compatible también. |
 | Python 3.9 o menor | No soportado. |
+
+---
+
+## PASO 0 — Obtener el código
+
+### Opción A — Clonar desde GitHub (recomendado)
+
+Necesitas tener [Git para Windows](https://git-scm.com/download/win) instalado.
+
+```powershell
+git clone https://github.com/adamrz5/GhostFrame-Studio.git
+cd GhostFrame-Studio
+```
+
+### Opción B — Descargar ZIP
+
+1. Ve a https://github.com/adamrz5/GhostFrame-Studio
+2. Haz clic en **Code → Download ZIP**
+3. Descomprime en la carpeta que quieras y entra en ella
 
 ---
 
@@ -24,13 +43,14 @@ python --version
 ```
 
 Si muestra `Python 3.12.x` o `Python 3.11.x`, continúa al paso 2.  
-Si no tienes Python instalado: https://www.python.org/downloads/
+Si no tienes Python instalado: https://www.python.org/downloads/  
+Durante la instalación, **marca la opción "Add Python to PATH"**.
 
 ---
 
 ## PASO 2 — FFmpeg
 
-FFmpeg es el motor de vídeo para leer y renderizar.
+FFmpeg es el motor de vídeo para leer y renderizar. La build incluida en el repositorio ya está dentro de la carpeta del proyecto y se detecta automáticamente. Si no está o la quieres actualizar:
 
 ### Opción A — Dentro del proyecto (recomendado, sin tocar el PATH)
 
@@ -38,9 +58,9 @@ FFmpeg es el motor de vídeo para leer y renderizar.
    https://github.com/BtbN/FFmpeg-Builds/releases  
    Archivo: `ffmpeg-master-latest-win64-gpl.zip`
 
-2. Descomprime el ZIP **dentro de la carpeta `faceblur_studio/`**:
+2. Descomprime el ZIP **dentro de la carpeta `GhostFrame-Studio/`**:
    ```
-   faceblur_studio/
+   GhostFrame-Studio/
    └── ffmpeg-master-latest-win64-gpl/
        └── bin/
            ├── ffmpeg.exe
@@ -64,7 +84,7 @@ FFmpeg es el motor de vídeo para leer y renderizar.
 Abre **PowerShell** en la carpeta del proyecto:
 
 ```powershell
-cd C:\ruta\a\faceblur_studio
+cd C:\ruta\a\GhostFrame-Studio
 python -m venv .venv
 .\.venv\Scripts\activate
 ```
@@ -99,7 +119,7 @@ Hay dos rutas según tu GPU. Elige una:
 
 ---
 
-### RUTA A — DirectML (cualquier GPU, sin instalar nada extra)
+### RUTA A — DirectML (cualquier GPU, opción más fácil)
 
 Funciona con cualquier GPU con DirectX 12: NVIDIA, AMD e Intel desde 2015.  
 **No necesitas instalar CUDA Toolkit ni ningún driver adicional.**
@@ -117,52 +137,28 @@ Reinicia el programa. La barra inferior mostrará `[buffalo_l / DirectML GPU]`.
 ### RUTA B — CUDA (solo NVIDIA, máximo rendimiento)
 
 **30-50% más rápido que DirectML** en GPUs NVIDIA.  
-Requiere instalar el CUDA Toolkit de NVIDIA antes del paso de pip.
+**No necesitas instalar el CUDA Toolkit del sistema** — las DLLs necesarias se instalan directamente vía pip.
 
-#### B.1 — Instalar CUDA Toolkit 12.6
-
-> Solo necesitas hacer esto una vez. El instalador no toca tus drivers de juegos.
-
-1. Descarga el instalador desde:  
-   **https://developer.nvidia.com/cuda-12-6-0-download-archive**
-
-   Selecciona:
-   - Operating System: `Windows`
-   - Architecture: `x86_64`
-   - Version: `11` (Windows 11) o `10` (Windows 10)
-   - Installer Type: `exe (local)` — descarga todo el instalador (~3 GB)
-
-2. Ejecuta el instalador con permisos de administrador.
-
-3. En el paso "Installation Options" elige **Custom (Advanced)**:
-   - Marca: `CUDA → Runtime` (obligatorio)
-   - Marca: `CUDA → Development` (opcional, para desarrolladores)
-   - Desmarca: `CUDA → Visual Studio Integration` (no lo necesitas)
-   - Desmarca: `Documentation` y `Samples` (ahorras espacio)
-   - El instalador detecta y actualiza los drivers NVIDIA si hace falta
-
-4. Completa la instalación (puede tardar 5-10 minutos).
-
-5. **Verifica** abriendo una terminal nueva:
-   ```powershell
-   nvcc --version
-   ```
-   Debe mostrar `release 12.6`. Si el comando no existe, reinicia el PC y vuelve a probar.
-
-#### B.2 — Instalar onnxruntime-gpu
+#### B.1 — Instalar onnxruntime-gpu y DLLs CUDA
 
 ```powershell
-pip uninstall onnxruntime-directml -y
-pip uninstall onnxruntime -y
+pip uninstall onnxruntime onnxruntime-directml -y
 pip install onnxruntime-gpu==1.19.2
+pip install nvidia-cuda-runtime-cu12 nvidia-cublas-cu12 nvidia-cudnn-cu12 nvidia-cuda-nvrtc-cu12 nvidia-cufft-cu12 nvidia-curand-cu12 nvidia-cusparse-cu12 nvidia-cusolver-cu12 nvidia-nvjitlink-cu12
 ```
 
-#### B.3 — Configurar el proveedor
+> **¿Por qué tantos paquetes `nvidia-*-cu12`?**  
+> En lugar de instalar el CUDA Toolkit completo del sistema (~3 GB), estos paquetes pip
+> contienen exactamente las DLLs que necesita ONNX Runtime. El programa las registra
+> automáticamente en el PATH del proceso al arrancar (`_preload_nvidia_dlls`).
+> No tienes que tocar variables de entorno ni instalar nada más.
+
+#### B.2 — Configurar el proveedor
 
 En el programa: **Herramientas → Configuración → Proveedor ONNX → `cuda`**  
 Guarda y reinicia. La barra inferior mostrará `[buffalo_l / CUDA GPU]`.
 
-#### B.4 — Verificar que CUDA funciona realmente
+#### B.3 — Verificar que CUDA funciona
 
 ```powershell
 python -c "import onnxruntime as ort; print(ort.get_available_providers())"
@@ -171,8 +167,8 @@ python -c "import onnxruntime as ort; print(ort.get_available_providers())"
 Debe mostrar `CUDAExecutionProvider` en la lista.
 
 > **Si ves errores `LoadLibrary failed with error 126`** al arrancar el programa:  
-> El CUDA Toolkit no se instaló correctamente o la variable PATH no se actualizó.  
-> Reinicia el PC e inténtalo de nuevo. Si persiste, usa la Ruta A (DirectML).
+> Falta alguno de los paquetes `nvidia-*-cu12`. Ejecuta de nuevo el comando `pip install nvidia-*-cu12`
+> del punto B.1 completo, con el entorno virtual activado. Si persiste, usa la Ruta A (DirectML).
 
 ---
 
@@ -190,20 +186,42 @@ python -c "import onnxruntime as ort; print(ort.get_available_providers())"
 
 ---
 
-## PASO 6 — Primera ejecución
+## PASO 6 — Audio en preview (opcional)
+
+El render final **siempre conserva el audio** aunque no hagas este paso.  
+Este paso solo añade audio al **preview en tiempo real** dentro de la app.
+
+GhostFrame usa `libmpv-2.dll` para reproducir audio en el preview. Esta DLL **no está incluida en el repositorio** de GitHub (supera el límite de 100 MB de GitHub).
+
+### Cómo conseguirla
+
+1. Ve a https://github.com/shinchiro/mpv-winbuild-cmake/releases
+2. Descarga el archivo `mpv-x86_64-<fecha>-git-<hash>.7z` más reciente
+3. Abre el `.7z` con [7-Zip](https://www.7-zip.org/) o WinRAR
+4. Extrae únicamente el archivo `libmpv-2.dll`
+5. Cópialo junto a `main.py` dentro de la carpeta `GhostFrame-Studio/`
+
+Si `libmpv-2.dll` no está disponible, GhostFrame abre igual pero el preview funciona sin audio.
+
+---
+
+## PASO 7 — Primera ejecución
+
+Con el entorno virtual activado:
 
 ```powershell
 python main.py
 ```
 
-La primera vez descarga el modelo `buffalo_l` (~500 MB). Necesitas internet.  
+La primera vez descarga el modelo `buffalo_l` (~500 MB). Necesitas conexión a internet.  
 Se guarda en `C:\Users\TU_USUARIO\.insightface\models\buffalo_l\` y no se vuelve a descargar.
 
 ---
 
-## PASO 7 — Arranque rápido (uso diario)
+## PASO 8 — Arranque rápido (uso diario)
 
-Crea un archivo `run.bat` en la carpeta del proyecto:
+El proyecto incluye `run_silent.bat` para arrancar sin consola visible con doble clic.  
+También puedes crear tu propio `run.bat`:
 
 ```bat
 @echo off
@@ -227,6 +245,8 @@ Una vez el programa funciona, optimiza estos valores en **Herramientas → Confi
 | Tamaño detector | 320 | 4x más rápido que 640, suficiente para entrevistas |
 | Proveedor ONNX | directml o cuda | GPU siempre mejor que cpu |
 | Umbral similitud | 0.65 | Evita fragmentar la misma persona en múltiples IDs |
+
+El menú **Herramientas → Configuración → Aplicar configuración recomendada** detecta tu hardware y sugiere valores automáticamente.
 
 ---
 
@@ -265,7 +285,7 @@ https://aka.ms/vs/17/release/vc_redist.x64.exe
 ```powershell
 python -c "from core.ffmpeg_utils import find_ffmpeg; print(find_ffmpeg())"
 ```
-Si muestra `None`, coloca la carpeta de FFmpeg dentro de `faceblur_studio/` (Paso 2 Opción A)  
+Si muestra `None`, coloca la carpeta de FFmpeg dentro de `GhostFrame-Studio/` (Paso 2 Opción A)  
 o configura la ruta en Herramientas → Configuración → FFmpeg.
 
 ---
@@ -278,7 +298,7 @@ python -c "import onnxruntime as ort; print(ort.get_available_providers())"
 ```
 
 - Solo aparece `CPUExecutionProvider` → instala `onnxruntime-directml` o `onnxruntime-gpu`
-- Aparece `CUDAExecutionProvider` pero hay errores `LoadLibrary failed 126` → CUDA Toolkit no instalado, usa DirectML
+- Aparece `CUDAExecutionProvider` pero hay errores `LoadLibrary failed 126` → falta algún paquete `nvidia-*-cu12`, repite el Paso 5 Ruta B.1 completo
 - Aparece `DmlExecutionProvider` → DirectML activo, configura proveedor en el programa y reinicia
 
 ---
@@ -290,45 +310,49 @@ Descomprime `buffalo_l.zip` en `C:\Users\TU_USUARIO\.insightface\models\buffalo_
 
 ---
 
-### Ajuste si venías de una versión anterior
+### Restablecer configuración predeterminada
 
-La versión anterior usaba `similarity_threshold = 0.55` y `det_size = 640`.  
-Los nuevos valores por defecto son `0.65` y `320`.
-
-Para aplicarlos borra la configuración guardada:
+Si quieres borrar la configuración guardada y volver a los valores por defecto:
 ```powershell
-del %USERPROFILE%\.faceblur_studio_settings.json
+del %USERPROFILE%\.ghostframe_studio_settings.json
 ```
+
+---
+
+### Los análisis guardados no se cargan tras mover el proyecto
+
+Las sesiones `.gfs` se guardan en `cache/sessions/` dentro del proyecto y se identifican por el contenido del vídeo, no por la ruta. Si mueves la carpeta del proyecto, los análisis siguen funcionando mientras el vídeo original esté accesible.
 
 ---
 
 ## Estructura del proyecto
 
 ```
-faceblur_studio/
+GhostFrame-Studio/
 ├── main.py                  <- Punto de entrada
 ├── requirements.txt         <- Dependencias pip
 ├── INSTALACION.md           <- Esta guía
-├── run.bat                  <- Arranque rapido (crear manualmente)
-├── .venv/                   <- Entorno virtual Python
-├── ffmpeg-*/                <- FFmpeg (auto-detectado si esta aqui dentro)
-|   └── bin/
-|       ├── ffmpeg.exe
-|       └── ffprobe.exe
+├── run_silent.bat           <- Arranque sin consola
+├── .venv/                   <- Entorno virtual Python (no en GitHub)
+├── libmpv-2.dll             <- Audio en preview (descargar por separado, no en GitHub)
+├── ffmpeg-*/                <- FFmpeg (auto-detectado si está aquí)
+│   └── bin/
+│       ├── ffmpeg.exe
+│       └── ffprobe.exe
 ├── core/
-│   ├── face_detector.py     <- InsightFace / ArcFace + seleccion GPU
-│   ├── face_tracker.py      <- Tracking IoU + FAISS + consolidacion
-│   ├── ffmpeg_utils.py      <- Pipe ffmpeg + auto-deteccion de ruta
+│   ├── face_detector.py     <- InsightFace / ArcFace + selección GPU
+│   ├── face_tracker.py      <- Tracking IoU + FAISS + consolidación
+│   ├── ffmpeg_utils.py      <- Pipe ffmpeg + auto-detección de ruta
 │   ├── renderer.py          <- Orquestador de renderizado
-│   ├── session.py           <- Guardado/carga de analisis (.fbs)
-│   ├── settings.py          <- Configuracion persistente JSON
+│   ├── session.py           <- Guardado/carga de análisis (.gfs)
+│   ├── settings.py          <- Configuración persistente JSON
 │   └── video_processor.py   <- Efectos blur/pixelate/blackbox
 └── ui/
     ├── main_window.py       <- Ventana principal
     ├── person_card.py       <- Tarjeta por persona detectada
-    ├── preview_widget.py    <- Previsualizacion de frames
+    ├── preview_widget.py    <- Previsualización de frames
     ├── timeline_widget.py   <- Barra de tiempo / scrubber
-    ├── settings_dialog.py   <- Dialogo de configuracion
+    ├── settings_dialog.py   <- Diálogo de configuración
     └── batch_dialog.py      <- Procesado en lote
 ```
 
@@ -336,12 +360,12 @@ faceblur_studio/
 
 ## Requisitos del sistema
 
-| Componente | Minimo | Recomendado |
+| Componente | Mínimo | Recomendado |
 |---|---|---|
 | SO | Windows 10 64-bit | Windows 11 |
-| Python | 3.11.x o 3.12.x | 3.12.10 |
+| Python | 3.11.x o 3.12.x | 3.12.x |
 | RAM | 8 GB | 16 GB |
 | GPU | Cualquiera con DirectX 12 | NVIDIA RTX con 4+ GB VRAM |
-| Disco | 3 GB libres | 10 GB (modelos + videos) |
+| Disco | 3 GB libres | 10 GB (modelos + vídeos) |
 | FFmpeg | 4.x+ | 7.x (BtbN build) |
-| CUDA Toolkit | No necesario con DirectML | 12.6 si usas onnxruntime-gpu |
+| CUDA Toolkit | No necesario | No necesario (DLLs vía pip) |

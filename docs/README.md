@@ -1,5 +1,7 @@
 # GhostFrame Studio
 
+> **Repositorio:** https://github.com/adamrz5/GhostFrame-Studio
+
 Editor de censura facial para vídeos de entrevistas. Detecta, rastrea y re-identifica
 personas a lo largo de todo el vídeo (aunque salgan y vuelvan a aparecer), y permite
 censurarlas de forma selectiva sin pérdida de calidad de audio ni de imagen.
@@ -9,58 +11,51 @@ colores distintos por persona para que cada cara detectada sea fácil de reconoc
 
 ---
 
+## Instalación rápida
+
+```powershell
+git clone https://github.com/adamrz5/GhostFrame-Studio.git
+cd GhostFrame-Studio
+python -m venv .venv
+.\.venv\Scripts\activate
+pip install -r requirements.txt
+# Elige UN proveedor ONNX según tu GPU (ver abajo)
+python main.py
+```
+
+Para la guía de instalación completa paso a paso (GPU, libmpv, FFmpeg, solución de problemas):  
+→ **[INSTALACION.md](../INSTALACION.md)**
+
+---
+
 ## Requisitos del sistema
 
 | Requisito | Detalle |
 |-----------|---------|
 | Python | **3.12** recomendado (3.11 compatible; 3.14 no soportado) |
-| FFmpeg | En el PATH, configurado en Ajustes, o incluido como carpeta `ffmpeg*/bin/` dentro del proyecto ([descargar](https://ffmpeg.org/download.html)) |
+| FFmpeg | En el PATH, configurado en Ajustes, o carpeta `ffmpeg*/bin/` dentro del proyecto ([descargar](https://github.com/BtbN/FFmpeg-Builds/releases)) |
 | Visual C++ Redist. | Requerido en Windows para ONNX Runtime ([descargar](https://aka.ms/vs/17/release/vc_redist.x64.exe)) |
 | numpy | **<2.0** — insightface 0.7.3 no es compatible con numpy 2.x |
 | onnxruntime | **1.19.2 exacto** — instalar solo UNA variante: `onnxruntime`, `onnxruntime-gpu` o `onnxruntime-directml` |
+| libmpv-2.dll | Opcional — solo para audio en preview. **No incluida en el repositorio** (>100 MB). Descargar de [mpv-winbuild-cmake](https://github.com/shinchiro/mpv-winbuild-cmake/releases) |
 
 ---
 
-## Instalación
+## Proveedor ONNX — elige uno
 
-### Opción recomendada en Windows
-
-Ejecuta:
-
-```bat
-INSTALACION.bat
-```
-
-El instalador pregunta qué GPU tienes:
-
-- **NVIDIA**: instala `onnxruntime-gpu` + DLLs CUDA vía pip.
-- **AMD / Intel / NVIDIA universal**: instala `onnxruntime-directml`.
-- **CPU**: instala `onnxruntime`.
-
-También comprueba FFmpeg, `libmpv-2.dll` para audio en preview y Visual C++
-Redistributable. `libmpv-2.dll` debe estar junto a `main.py` para escuchar audio
-en el preview; si falta, GhostFrame abre igual pero el preview va sin audio.
-
-### Instalación manual
-
-```bash
-cd ghostframe_studio
-pip install -r requirements.txt
-```
-
-> `requirements.txt` instala la base. Después debes instalar **un solo** proveedor
-> ONNX: `onnxruntime`, `onnxruntime-gpu` u `onnxruntime-directml`.
-> La primera vez que se ejecute, InsightFace descargará automáticamente el modelo
-> `buffalo_l` (~500 MB).
-
-Para acelerar la detección con GPU NVIDIA/CUDA (recomendado en NVIDIA):
-```bash
-pip uninstall onnxruntime onnxruntime-gpu onnxruntime-directml -y
+```powershell
+# GPU NVIDIA (más rápido, no requiere CUDA Toolkit del sistema):
 pip install onnxruntime-gpu==1.19.2
 pip install nvidia-cuda-runtime-cu12 nvidia-cublas-cu12 nvidia-cudnn-cu12 nvidia-cuda-nvrtc-cu12 nvidia-cusolver-cu12 nvidia-cufft-cu12 nvidia-curand-cu12 nvidia-cusparse-cu12 nvidia-nvjitlink-cu12
+
+# GPU universal Windows — NVIDIA / AMD / Intel (DirectX 12):
+pip install onnxruntime-directml==1.19.2
+
+# CPU puro (siempre funciona):
+pip install onnxruntime==1.19.2
 ```
 
-No hace falta instalar CUDA Toolkit del sistema para esta configuración: el programa añade
+No hace falta instalar el CUDA Toolkit del sistema para la opción NVIDIA: el programa añade
 al `PATH` del proceso las DLL de los paquetes `nvidia-*-cu12` instalados por pip antes de
 cargar ONNX Runtime.
 
@@ -71,7 +66,7 @@ cargar ONNX Runtime.
 ```bash
 python main.py
 # O con un vídeo directamente:
-python main.py /ruta/al/video.mp4
+python main.py C:\ruta\al\video.mp4
 ```
 
 Al arrancar, GhostFrame comprueba paquetes Python, FFmpeg y DLLs CUDA opcionales.
@@ -188,7 +183,7 @@ CPU, RAM, GPU, proveedores disponibles de ONNX Runtime y encoders FFmpeg.
 ## Estructura de archivos
 
 ```
-ghostframe_studio/
+GhostFrame-Studio/
 ├── main.py                    # Punto de entrada + crash handler global
 ├── requirements.txt
 ├── core/
@@ -217,13 +212,13 @@ ghostframe_studio/
 | `DLL load failed` en Windows | Instala [Visual C++ Redistributable x64](https://aka.ms/vs/17/release/vc_redist.x64.exe) |
 | `numpy 2.x incompatible` | `pip install "numpy<2"` |
 | FFmpeg no encontrado | Coloca una carpeta `ffmpeg*/bin/` dentro del proyecto, añade `bin/` al PATH o configura la ruta en Configuración |
-| CUDA cae a CPU / `LoadLibrary error 126` | Reinstala todos los paquetes `nvidia-*-cu12` dentro de la `.venv` (ver INSTALACION.md Ruta B) |
+| CUDA cae a CPU / `LoadLibrary error 126` | Reinstala todos los paquetes `nvidia-*-cu12` dentro de la `.venv` (ver INSTALACION.md Paso 5 Ruta B) |
 | El tracker une dos personas distintas | Aumenta el umbral de similitud (>0.65) y/o usa Fusionar/Dividir |
 | El tracker separa a la misma persona | Reduce el umbral de similitud o usa Fusionar/Dividir |
 | Vídeo sin audio en el output | El vídeo original no tiene audio, o FFmpeg no pudo leer/convertir el stream de audio |
-| El manual se ve claro u oscuro incorrectamente | La versión actual fuerza manual con fondo negro y texto blanco |
 | Vídeo con tinte verde/rosa en Telegram después del render | Fuente HDR (smpte2084/HLG) — la versión actual fuerza los tres tags de color a bt709 automáticamente |
 | El diálogo de Configuración se quedó congelado | Espera 8 segundos; hay un timeout automático que lo rehabilita |
+| No hay audio en el preview | `libmpv-2.dll` no está en la carpeta del proyecto — ver INSTALACION.md Paso 6 |
 
 ---
 

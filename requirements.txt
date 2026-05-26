@@ -1,5 +1,7 @@
 # ══════════════════════════════════════════════════════════════════════════════
 # GhostFrame Studio — Dependencias
+# https://github.com/adamrz5/GhostFrame-Studio
+#
 # Python 3.12 recomendado (probado y funcionando).
 # Python 3.14+ NO es compatible con ningún paquete de IA todavía.
 # ══════════════════════════════════════════════════════════════════════════════
@@ -7,8 +9,7 @@
 # INSTALACIÓN ESTÁNDAR (base, sin proveedor ONNX):
 #   pip install -r requirements.txt
 #
-# Recomendado en Windows: ejecutar instalar.bat. Ese script pregunta por tu GPU
-# e instala SOLO el proveedor ONNX correcto para evitar conflictos.
+# Para la guía completa paso a paso: ver INSTALACION.md
 #
 # ─────────────────────────────────────────────────────────────────────────────
 # PROVEEDOR ONNX — instala SOLO UNO de los tres (entran en conflicto):
@@ -27,8 +28,8 @@
 #                   nvidia-cusparse-cu12 nvidia-cusolver-cu12 nvidia-nvjitlink-cu12
 #
 #       main.py añade automáticamente los directorios de DLLs al PATH en arranque
-#       (función _preload_nvidia_dlls). No es necesario tocar variables de entorno.
-#       Verificado con: RTX 3060, driver 596.49, CUDA 12.x.
+#       (función _preload_nvidia_dlls). No es necesario tocar variables de entorno
+#       ni instalar el CUDA Toolkit del sistema.
 #
 # ¡NO instales más de un proveedor onnxruntime a la vez!
 #
@@ -54,7 +55,7 @@ onnx==1.16.1                    # versión exacta compatible con onnxruntime 1.1
                                 # techo confirmado; >=1.20 cambia APIs internas de insightface
 
 # ── Búsqueda de similitud vectorial ──────────────────────────────────────────
-faiss-cpu==1.8.0.post1          # hay wheel precompilado para Windows cp310/cp311
+faiss-cpu==1.8.0.post1          # hay wheel precompilado para Windows cp310/cp311/cp312
 
 # ── Fallback scipy para similitud coseno (si faiss no está disponible) ───────
 scipy>=1.11.0,<2.0.0
@@ -71,7 +72,7 @@ Pillow>=10.0.0,<11.0.0
 # maestro de audio en la preview (sin audio = reloj monotónico de sustitución).
 #
 # Requisito adicional OBLIGATORIO para escuchar audio en preview en Windows:
-# libmpv-2.dll (NO incluida en python-mpv).
+# libmpv-2.dll — NO incluida en este repositorio (supera el límite de 100 MB de GitHub).
 # Descargar de: https://github.com/shinchiro/mpv-winbuild-cmake/releases
 #   → mpv-x86_64-<fecha>-git-<hash>.7z  → extraer libmpv-2.dll al directorio del proyecto
 #   o añadir su carpeta al PATH de Windows.
@@ -94,6 +95,7 @@ pytest>=9.0.0,<10.0.0
 #
 # En el primer arranque, insightface descargará el modelo buffalo_l (~500 MB)
 # desde https://github.com/deepinsight/insightface. Necesitas conexión a internet.
+# Se guarda en C:\Users\<usuario>\.insightface\models\buffalo_l\ (una sola vez).
 #
 # El preview reproduce audio cuando libmpv-2.dll está disponible (ver bloque
 # python-mpv más arriba). El render final siempre conserva audio y copia
