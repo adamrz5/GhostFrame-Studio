@@ -25,7 +25,7 @@ El programa arranca y funciona correctamente con:
 ## Problema principal resuelto: CPU al 80-83% con GPU al 50%
 
 ### Causa raíz
-`face_detector.py` tenía un flag hardcodeado `_FORCE_CPU_PROVIDER = True` en la línea 27 que forzaba CPU independientemente de la configuración. Era un flag de debug que nunca se revirtió.
+`face_detector.py` tenía un flag hardcodeado `_FORCE_CPU_PROVIDER = True` en la línea 27 que forzaba CPU independientemente de la configuración.
 
 ### Solución completa (varias fases)
 1. **Eliminar `_FORCE_CPU_PROVIDER`** — causa raíz.
@@ -132,7 +132,7 @@ def _draw_dashed_rect(img, x1, y1, x2, y2, color, dash=7, gap=5):
 ### `main.py`
 - `_preload_nvidia_dlls()`: añade todos los directorios `nvidia/*/bin/` de los paquetes pip a PATH y `os.add_dll_directory()`. Lista completa: `cuda_runtime`, `cublas`, `cudnn`, `cuda_nvrtc`, `cusolver`, `cufft`, `curand`, `cusparse`, `nvjitlink`.
 - Llamada antes de cualquier import de onnxruntime o insightface.
-- Import de `onnx.onnx_cpp2py_export` antes de PyQt5 (fix para setup específico de Windows).
+- Import de `onnx.onnx_cpp2py_export` antes de PyQt5 (workaround para setup específico de Windows).
 
 ### `core/face_detector.py`
 - Eliminado `_FORCE_CPU_PROVIDER = True`.
@@ -147,7 +147,7 @@ def _draw_dashed_rect(img, x1, y1, x2, y2, color, dash=7, gap=5):
 ### `core/face_tracker.py`
 - `_next_id: int = 0` como counter monotónico O(1) (antes `max(ids)+1` por cada persona nueva).
 - `_invalidate_index()` movido fuera del bucle de detecciones — se llama una vez por frame.
-- `last_bbox_before(window: int = 30)` — default corregido de 10 a 30.
+- `last_bbox_before(window: int = 30)` — default actualizado de 10 a 30.
 
 ### `core/settings.py`
 - `"execution_provider": "cuda"` (era `"auto"`).
@@ -197,13 +197,13 @@ def _draw_dashed_rect(img, x1, y1, x2, y2, color, dash=7, gap=5):
 - Cada persona conserva color propio en borde, nombre y barra de apariciones.
 
 ### `ui/batch_dialog.py`
-- Título corregido a `"Modo Batch — GhostFrame"`.
+- Título actualizado a `"Modo Batch — GhostFrame"`.
 
 ---
 
 ## Pendiente / próximos pasos
 
-- **M-2** (interpolación en cortes de escena detectados): pospuesto. Requiere detección de scene cuts con superficie de cambio alta. Todos los demás bugs están resueltos.
+- **M-2** (interpolación en cortes de escena detectados): pospuesto. Requiere detección de scene cuts con superficie de cambio alta.
 
 ---
 
