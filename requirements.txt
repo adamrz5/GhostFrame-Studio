@@ -1,0 +1,102 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# GhostFrame Studio — Dependencias
+# Python 3.12 recomendado (probado y funcionando).
+# Python 3.14+ NO es compatible con ningún paquete de IA todavía.
+# ══════════════════════════════════════════════════════════════════════════════
+#
+# INSTALACIÓN ESTÁNDAR (base, sin proveedor ONNX):
+#   pip install -r requirements.txt
+#
+# Recomendado en Windows: ejecutar instalar.bat. Ese script pregunta por tu GPU
+# e instala SOLO el proveedor ONNX correcto para evitar conflictos.
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# PROVEEDOR ONNX — instala SOLO UNO de los tres (entran en conflicto):
+# ─────────────────────────────────────────────────────────────────────────────
+#
+#   CPU puro (siempre funciona, más lento):
+#       pip install onnxruntime==1.19.2
+#
+#   GPU universal Windows — NVIDIA / AMD / Intel con DirectX 12:
+#       pip install onnxruntime-directml==1.19.2
+#
+#   GPU NVIDIA vía CUDA (más rápido — NO requiere CUDA Toolkit del sistema):
+#       pip install onnxruntime-gpu==1.19.2
+#       pip install nvidia-cuda-runtime-cu12 nvidia-cublas-cu12 nvidia-cudnn-cu12 \
+#                   nvidia-cuda-nvrtc-cu12 nvidia-cufft-cu12 nvidia-curand-cu12  \
+#                   nvidia-cusparse-cu12 nvidia-cusolver-cu12 nvidia-nvjitlink-cu12
+#
+#       main.py añade automáticamente los directorios de DLLs al PATH en arranque
+#       (función _preload_nvidia_dlls). No es necesario tocar variables de entorno.
+#       Verificado con: RTX 3060, driver 596.49, CUDA 12.x.
+#
+# ¡NO instales más de un proveedor onnxruntime a la vez!
+#
+# La app puede recomendar automáticamente proveedor/ajustes en:
+#   Herramientas -> Configuración -> Aplicar configuración recomendada
+# ══════════════════════════════════════════════════════════════════════════════
+
+# ── Procesado numérico ────────────────────────────────────────────────────────
+# CRÍTICO: insightface 0.7.3 usa np.int (eliminado en numpy 2.0)
+# faiss-cpu 1.8.x también fue compilado contra la ABI de numpy 1.x
+numpy>=1.22.0,<2.0.0
+
+# ── Visión por computadora ────────────────────────────────────────────────────
+# IMPORTANTE: usar opencv-python-HEADLESS para evitar conflicto de librerías Qt
+# con PyQt5 (ambos bundlean Qt → ImportError en Windows si se instalan juntos)
+opencv-python-headless>=4.8.0,<4.11.0
+
+# ── Detección facial y embeddings ArcFace ────────────────────────────────────
+insightface==0.7.3              # única versión estable y probada en Windows
+onnx==1.16.1                    # versión exacta compatible con onnxruntime 1.19.2
+                                # (1.17+ rompe ops de los modelos buffalo_l/buffalo_s)
+# onnxruntime==1.19.2           # <-- descomenta SOLO si usas CPU (ver bloque de arriba)
+                                # techo confirmado; >=1.20 cambia APIs internas de insightface
+
+# ── Búsqueda de similitud vectorial ──────────────────────────────────────────
+faiss-cpu==1.8.0.post1          # hay wheel precompilado para Windows cp310/cp311
+
+# ── Fallback scipy para similitud coseno (si faiss no está disponible) ───────
+scipy>=1.11.0,<2.0.0
+
+# ── Interfaz gráfica ──────────────────────────────────────────────────────────
+PyQt5>=5.15.9,<6.0.0            # NO PyQt6 — API distinta; 5.15.9 = último stable
+
+# ── Utilidades ────────────────────────────────────────────────────────────────
+tqdm>=4.65.0
+Pillow>=10.0.0,<11.0.0
+
+# ── Audio en preview (opcional) ───────────────────────────────────────────────
+# python-mpv es el binding Python para libmpv. Permite usar mpv como reloj
+# maestro de audio en la preview (sin audio = reloj monotónico de sustitución).
+#
+# Requisito adicional OBLIGATORIO para escuchar audio en preview en Windows:
+# libmpv-2.dll (NO incluida en python-mpv).
+# Descargar de: https://github.com/shinchiro/mpv-winbuild-cmake/releases
+#   → mpv-x86_64-<fecha>-git-<hash>.7z  → extraer libmpv-2.dll al directorio del proyecto
+#   o añadir su carpeta al PATH de Windows.
+#
+# Si libmpv no está disponible, GhostFrame arranca igual, pero la preview funciona
+# sin audio. El render final conserva audio aunque falte libmpv.
+python-mpv>=1.0.3
+
+# ── Tests ───────────────────────────────────────────────────────────────────
+pytest>=9.0.0,<10.0.0
+
+# ══════════════════════════════════════════════════════════════════════════════
+# NOTA — FFmpeg (externo, no pip)
+# ══════════════════════════════════════════════════════════════════════════════
+# Descarga: https://github.com/BtbN/FFmpeg-Builds/releases
+#           → ffmpeg-master-latest-win64-gpl.zip
+# Descomprime dentro del proyecto como ffmpeg*/bin/ para auto-detección,
+# añade la carpeta bin\ al PATH de Windows, o configura la ruta en
+# Herramientas → Configuración → FFmpeg.
+#
+# En el primer arranque, insightface descargará el modelo buffalo_l (~500 MB)
+# desde https://github.com/deepinsight/insightface. Necesitas conexión a internet.
+#
+# El preview reproduce audio cuando libmpv-2.dll está disponible (ver bloque
+# python-mpv más arriba). El render final siempre conserva audio y copia
+# subtítulos cuando existen. La interfaz usa tema negro con texto blanco y
+# colores distintos por persona/cara.
+# ══════════════════════════════════════════════════════════════════════════════

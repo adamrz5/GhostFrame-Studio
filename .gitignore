@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Entorno virtual
+.venv/
+venv/
+env/
+
+# Sesiones de análisis (regenerables)
+cache/sessions/
+
+# Vídeos renderizados
+renders/
+
+# Logs
+logs/
+
+# Archivos temporales
+*.tmp
+*.tmp_*
+
+# FFmpeg bundled (binario pesado)
+ffmpeg-*/
+
+# Configuración personal (se guarda en home del usuario)
+.ghostframe_studio_settings.json
+.ghostframe_studio_session.key
