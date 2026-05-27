@@ -19,7 +19,7 @@
 
 ## Demo
 
-<!-- DEMO_VIDEO -->
+https://github.com/user-attachments/assets/fe1f2fd0-ec49-4e6f-a274-bda56f3768ec
 
 ---
 
@@ -112,8 +112,10 @@ Cada tarjeta permite:
 - Elegir el efecto: **Pixelado**, **Gaussian Blur** o **Caja negra**
 - Ajustar intensidad (1–10) y margen alrededor de la cara (0–50%)
 - Limitar la censura a un tramo concreto del vídeo
+- Ver una barra visual con los momentos exactos en que aparece esa persona
 
 ### 4 · Previsualizar
+Arrastra el timeline para ver la censura aplicada al instante.
 
 | Atajo | Acción |
 |-------|--------|
