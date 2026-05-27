@@ -15,6 +15,14 @@
 
 ---
 
+## Demo
+
+
+https://github.com/user-attachments/assets/fe1f2fd0-ec49-4e6f-a274-bda56f3768ec
+
+
+---
+
 GhostFrame Studio es una herramienta de escritorio para **censurar caras en vídeos de entrevistas y reportajes**. A diferencia de otras soluciones, recuerda quién es cada persona a lo largo de todo el vídeo — aunque salga del plano y vuelva — y te permite decidir con un toggle a quién censurar y con qué efecto, sin pérdida de calidad.
 
 ---
