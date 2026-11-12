@@ -1,16 +1,10 @@
-# GhostFrame Studio — Documentación
+# Documentación de GhostFrame Studio
 
-> El README principal del proyecto se encuentra en la raíz del repositorio.
-> 
-> 👉 [Ver README.md](../README.md)
+| Guía | Contenido |
+| --- | --- |
+| [Instalación desde el código](instalacion.md) | Python, FFmpeg, CUDA, DirectML y audio de la vista previa. |
+| [Uso](uso.md) | Censura por persona, atajos, ajustes avanzados y solución de problemas. |
+| [Arquitectura](arquitectura.md) | Estructura del repositorio, seguimiento facial y exportación. |
+| [Notas de desarrollo](context.md) | Historial técnico y decisiones de implementación. |
 
----
-
-## Contenido de esta carpeta
-
-| Archivo | Descripción |
-|---------|-------------|
-| [../README.md](../README.md) | Documentación principal del proyecto |
-| [../INSTALACION.md](../INSTALACION.md) | Guía de instalación paso a paso |
-| [../CHANGELOG.md](../CHANGELOG.md) | Historial de cambios por versión |
-| [context.md](context.md) | Notas técnicas internas de desarrollo |
+[Volver al proyecto](../README.md) · [Historial de cambios](../CHANGELOG.md)

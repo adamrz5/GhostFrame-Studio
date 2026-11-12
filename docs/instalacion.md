@@ -31,7 +31,6 @@ Descomprime la carpeta donde quieras, por ejemplo en `C:\GhostFrame-Studio\`.
 2. Ejecuta el instalador
 3. **MUY IMPORTANTE:** antes de pulsar Instalar, marca la casilla **"Add Python to PATH"**
 
-   [![Add to PATH](https://i.imgur.com/placeholder.png)](https://www.python.org)
 
 4. Verifica que funciona: abre PowerShell y escribe:
    ```
@@ -125,7 +124,7 @@ pip install onnxruntime==1.19.2
 
 Para escuchar el audio mientras previsualizas el vídeo dentro de la app necesitas instalar `libmpv-2.dll`. Sin este archivo el preview se ve pero no se escucha.
 
-> El vídeo que exportes **siempre tendrá audio** — esto solo afecta a lo que escuchas dentro del programa mientras trabajas.
+> La DLL solo afecta al audio de la vista previa.
 
 1. Ve a [github.com/shinchiro/mpv-winbuild-cmake/releases](https://github.com/shinchiro/mpv-winbuild-cmake/releases)
 2. Descarga el archivo `.7z` más reciente — el que se llama `mpv-x86_64-...`
@@ -149,7 +148,7 @@ python main.py
 
 ## PASO 10 — Arranque rápido para el día a día
 
-Para no tener que abrir PowerShell cada vez que uses el programa, haz doble clic en **`run_silent.bat`** — ya viene incluido en la carpeta. Abre GhostFrame directamente.
+Desde la carpeta del proyecto, ejecuta `.\.venv\Scripts\python.exe main.py` para abrir la aplicación con las dependencias del entorno virtual.
 
 ---
 

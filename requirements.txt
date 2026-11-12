@@ -9,7 +9,7 @@
 # INSTALACIÓN ESTÁNDAR (base, sin proveedor ONNX):
 #   pip install -r requirements.txt
 #
-# Para la guía completa paso a paso: ver INSTALACION.md
+# Para la guía completa paso a paso: ver docs/instalacion.md
 #
 # ─────────────────────────────────────────────────────────────────────────────
 # PROVEEDOR ONNX — instala SOLO UNO de los tres (entran en conflicto):
