@@ -3,9 +3,9 @@
 | Ruta | Contenido |
 | --- | --- |
 | [main.py](../main.py) | Arranque de la aplicación. |
-| [core/](../core/) | Detección, seguimiento, efectos, renderizado, sesiones y configuración. |
-| [ui/](../ui/) | Ventanas, tarjetas por persona, vista previa y línea de tiempo. |
-| [assets/](../assets/) | Icono y logotipo. |
+| [ghostframe/core/](../ghostframe/core/) | Detección, seguimiento, efectos, renderizado, sesiones y configuración. |
+| [ghostframe/ui/](../ghostframe/ui/) | Ventanas, tarjetas por persona, vista previa y línea de tiempo. |
+| [ghostframe/assets/](../ghostframe/assets/) | Icono y logotipo. |
 | [tests/](../tests/) | Pruebas automatizadas. |
 
 ## Seguimiento facial

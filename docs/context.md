@@ -29,7 +29,7 @@ El programa arranca y funciona correctamente con:
 
 ### Solución completa (varias fases)
 1. **Eliminar `_FORCE_CPU_PROVIDER`** — causa raíz.
-2. **Cambiar proveedor por defecto** de `"auto"` a `"cuda"` en `core/settings.py`.
+2. **Cambiar proveedor por defecto** de `"auto"` a `"cuda"` en `ghostframe/core/settings.py`.
 3. **DirectML descartado**: arquitecturalmente 2.8× más lento que CUDA en NVIDIA — usa sincronizaciones CPU en cada operación GPU. CPU seguía al 80% incluso con GPU al 50%.
 4. **Instalar `onnxruntime-gpu==1.19.2`** en lugar de `onnxruntime-directml`.
 5. **Resolver `LoadLibrary error 126`** (ver sección CUDA abajo).
@@ -99,7 +99,7 @@ print(sess.get_providers())  # debe mostrar ['CUDAExecutionProvider', 'CPUExecut
 
 ## Overlay de detección — diseño profesional (2026-05-25)
 
-Rediseñado al estilo Adobe Premiere. Implementado en `_apply_overlay()` y `_draw_dashed_rect()` de `ui/main_window.py`.
+Rediseñado al estilo Adobe Premiere. Implementado en `_apply_overlay()` y `_draw_dashed_rect()` de `ghostframe/ui/main_window.py`.
 
 ### Especificación visual
 - **Rectángulo fino 1 px** en color de acento de la persona:
@@ -134,7 +134,7 @@ def _draw_dashed_rect(img, x1, y1, x2, y2, color, dash=7, gap=5):
 - Llamada antes de cualquier import de onnxruntime o insightface.
 - Import de `onnx.onnx_cpp2py_export` antes de PyQt5 (workaround para setup específico de Windows).
 
-### `core/face_detector.py`
+### `ghostframe/core/face_detector.py`
 - Eliminado `_FORCE_CPU_PROVIDER = True`.
 - `_cuda_runtime_loadable()`: prueba `ctypes.CDLL("cudart64_12.dll")` (pip) y versiones de sistema CUDA 11.x/12.x.
 - `_build_providers()`: en modo "auto" verifica CUDA realmente cargable antes de incluirlo.
@@ -144,30 +144,30 @@ def _draw_dashed_rect(img, x1, y1, x2, y2, color, dash=7, gap=5):
 - Módulo-level counters `_consecutive_failures` y `_MAX_CONSECUTIVE_FAILURES = 10` para abortar solo tras 10 fallos consecutivos.
 - Prints en ASCII.
 
-### `core/face_tracker.py`
+### `ghostframe/core/face_tracker.py`
 - `_next_id: int = 0` como counter monotónico O(1) (antes `max(ids)+1` por cada persona nueva).
 - `_invalidate_index()` movido fuera del bucle de detecciones — se llama una vez por frame.
 - `last_bbox_before(window: int = 30)` — default actualizado de 10 a 30.
 
-### `core/settings.py`
+### `ghostframe/core/settings.py`
 - `"execution_provider": "cuda"` (era `"auto"`).
 - `"det_size": 320` (nueva clave, antes hardcodeado 640 en el detector).
 - Fichero temp con sufijo `f".tmp_{os.getpid()}_{uuid.uuid4().hex}"` para evitar colisiones.
 
-### `core/ffmpeg_utils.py`
+### `ghostframe/core/ffmpeg_utils.py`
 - `find_ffmpeg()`: busca subcarpetas `ffmpeg*/bin/ffmpeg.exe` dentro del directorio raíz del proyecto.
 - Render con subtítulos opcionales: `-map 1:s?` y `-c:s copy`.
 - HDR coerción completa: cuando `color_trc` es `smpte2084` o `arib-std-b67`, se fuerzan los tres tags (`colorspace`, `color_primaries`, `color_trc`) a `bt709`.
 - `verify_encoder()` con TTL-based failure caching: éxitos cacheados indefinidamente, fallos 5 minutos (`time.monotonic() + 300.0`).
 
-### `core/session.py`
+### `ghostframe/core/session.py`
 - `.gfs`: sesión firmada, versionada y ligada al vídeo mediante fingerprint rápido.
 - `.gfscfg`: export/import de configuración de censura por hash de thumbnail.
 - `_FINGERPRINT_CACHE` capeado a 64 entradas — evicción al superar el límite en lugar de `clear()`.
 - `except Exception` (ampliado de `except ValueError`) para capturar `RuntimeError` de HMAC corrupto.
 - `tracker._next_id = max(p.person_id for p in tracker.persons) + 1` después de cargar personas.
 
-### `ui/main_window.py`
+### `ghostframe/ui/main_window.py`
 - `_last_video_dir: str = ""` — clase variable, recuerda la última carpeta de vídeo abierta.
 - `btn_cancel_op` en topbar (rojo, oculto por defecto): aparece como "Cancelar análisis" o "Cancelar render" cuando arranca un worker.
 - `_cancel_current_operation()` — delega a `_current_worker.cancel()`.
@@ -180,23 +180,23 @@ def _draw_dashed_rect(img, x1, y1, x2, y2, color, dash=7, gap=5):
 - `_on_warmup_done()`: labels diferenciadas `"CUDA ✓ GPU"` / `"DirectML ✓ GPU"` / `"CPU ⚠"`.
 - Undo/redo para merge/split/regroup (`Ctrl+Z`, `Ctrl+Y`, `Ctrl+Shift+Z`).
 
-### `ui/settings_dialog.py`
+### `ghostframe/ui/settings_dialog.py`
 - `self.cmb_det_size`: ComboBox 320/640.
 - Bloque `Recomendación para este PC`.
 - `QTimer.singleShot(8000, self._timeout_recommendation)` — timeout de seguridad 8 s para el hilo de recomendación.
 - `_timeout_recommendation()` — fuerza cierre del hilo y rehabilita el diálogo.
 
-### `ui/preview_widget.py`
+### `ghostframe/ui/preview_widget.py`
 - Eliminada asignación duplicada `h2, w2 = rgb.shape[:2]`.
 - `QImage` usa `w, h` correctos (las variables muertas `h2, w2` ya no existen).
 - Zoom visual con rueda del ratón. Doble clic resetea a 1.0.
 
-### `ui/person_card.py`
+### `ghostframe/ui/person_card.py`
 - `_ft()` con fallback `fps = 25.0` cuando `self.fps <= 0`.
 - Tarjetas negras con texto blanco.
 - Cada persona conserva color propio en borde, nombre y barra de apariciones.
 
-### `ui/batch_dialog.py`
+### `ghostframe/ui/batch_dialog.py`
 - Título actualizado a `"Modo Batch — GhostFrame"`.
 
 ---

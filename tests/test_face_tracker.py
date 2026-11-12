@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from core.face_tracker import FaceTracker, Person
+from ghostframe.core.face_tracker import FaceTracker, Person
 
 
 def _embedding(value: float = 1.0) -> np.ndarray:

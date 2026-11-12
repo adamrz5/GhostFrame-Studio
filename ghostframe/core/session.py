@@ -15,11 +15,12 @@ import threading
 import uuid
 import numpy as np
 
+from ghostframe import PROJECT_ROOT
+
 SESSION_VERSION = 6  # bump this to force re-analysis on format changes
 _MAGIC = b"GFS6\n"
 _KEY_PATH = os.path.join(os.path.expanduser("~"), ".ghostframe_studio_session.key")
-_PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-_SESSION_CACHE_DIR = os.path.join(_PROJECT_ROOT, "cache", "sessions")
+_SESSION_CACHE_DIR = os.path.join(PROJECT_ROOT, "cache", "sessions")
 _FINGERPRINT_CACHE: dict[tuple[str, int, int], str] = {}
 _FINGERPRINT_LOCK = threading.Lock()   # protects concurrent BatchWorker + MainWindow access
 _FNAME_CACHE: dict[tuple[str, int], str] = {}
@@ -31,7 +32,7 @@ def _key_path_candidates() -> list[str]:
     local_appdata = os.environ.get("LOCALAPPDATA")
     if local_appdata:
         paths.append(os.path.join(local_appdata, "GhostFrame Studio", "ghostframe_session.key"))
-    paths.append(os.path.join(os.path.dirname(__file__), "..", "logs", "ghostframe_session.key"))
+    paths.append(os.path.join(PROJECT_ROOT, "logs", "ghostframe_session.key"))
     return [os.path.abspath(p) for p in paths]
 
 
@@ -144,7 +145,7 @@ def _person_to_payload(person) -> dict:
 
 
 def _person_from_payload(payload: dict):
-    from core.face_tracker import Person
+    from ghostframe.core.face_tracker import Person
 
     person = Person(int(payload["person_id"]), _array_from_payload(payload["thumbnail"]))
     person.embeddings = [
@@ -312,7 +313,7 @@ def load_session(video_path: str):
     (versión incompatible, firma incorrecta, vídeo distinto). Solo lanza
     ValueError si todos los candidatos existentes han fallado.
     """
-    from core.face_tracker import FaceTracker
+    from ghostframe.core.face_tracker import FaceTracker
 
     candidates = [p for p in session_path_candidates(video_path) if os.path.exists(p)]
     if not candidates:
@@ -332,7 +333,7 @@ def load_session(video_path: str):
 
 def _load_session_from_file(gfs_path: str, video_path: str):
     """Carga y valida un único archivo .gfs. Lanza ValueError si no es válido."""
-    from core.face_tracker import FaceTracker
+    from ghostframe.core.face_tracker import FaceTracker
 
     with open(gfs_path, "rb") as f:
         blob = f.read()

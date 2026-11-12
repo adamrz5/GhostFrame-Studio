@@ -12,8 +12,9 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import QThread, pyqtSignal, QObject
 
-from core import settings as cfg
-from ui.window_chrome import apply_dark_title_bar
+from ghostframe import PROJECT_ROOT
+from ghostframe.core import settings as cfg
+from ghostframe.ui.window_chrome import apply_dark_title_bar
 
 
 VIDEO_EXTS = {".mp4", ".mov", ".mkv", ".avi", ".webm", ".m4v", ".3gp", ".ts", ".flv"}
@@ -69,13 +70,13 @@ class BatchWorker(QObject):
         ]
 
     def run(self):
-        from core.face_detector import detect_faces
-        from core.face_tracker import FaceTracker
-        from core.video_processor import VideoReader
-        from core.renderer import render_video
-        from core import settings as cfg
-        from core import session as session_mod
-        from core.ffmpeg_utils import RenderCancelled, probe_video
+        from ghostframe.core.face_detector import detect_faces
+        from ghostframe.core.face_tracker import FaceTracker
+        from ghostframe.core.video_processor import VideoReader
+        from ghostframe.core.renderer import render_video
+        from ghostframe.core import settings as cfg
+        from ghostframe.core import session as session_mod
+        from ghostframe.core.ffmpeg_utils import RenderCancelled, probe_video
 
         total = len(self.video_paths)
         for i, vpath in enumerate(self.video_paths):
@@ -156,8 +157,7 @@ class BatchWorker(QObject):
                 # tracker local y no coinciden con los del vídeo principal.
                 persons_config = self._build_persons_config(tracker)
                 frame_data = {p.person_id: p.frame_data for p in tracker.persons}
-                project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-                renders_dir = os.path.join(project_root, "renders")
+                renders_dir = os.path.join(PROJECT_ROOT, "renders")
                 os.makedirs(renders_dir, exist_ok=True)
                 base = os.path.splitext(os.path.basename(vpath))[0]
                 out_path = os.path.join(renders_dir, f"{base}_censored.mp4")

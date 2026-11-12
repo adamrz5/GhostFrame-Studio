@@ -13,12 +13,9 @@ import datetime
 import atexit
 import tempfile
 
-# Ensure project root is on sys.path regardless of CWD
-_ROOT = os.path.dirname(os.path.abspath(__file__))
-if _ROOT not in sys.path:
-    sys.path.insert(0, _ROOT)
+from ghostframe import ASSETS_DIR, PROJECT_ROOT as _ROOT
 
-_APP_ICON_PATH = os.path.join(_ROOT, "assets", "ghostframe-app-icon.ico")
+_APP_ICON_PATH = os.path.join(ASSETS_DIR, "ghostframe-app-icon.ico")
 _LOG_DIR = os.path.join(_ROOT, "logs")
 _LOG_PATH = os.path.join(_LOG_DIR, "ghostframe.log")
 _LOG_FILE_HANDLE = None
@@ -150,14 +147,14 @@ def _preflight_dependencies() -> None:
 
     ffmpeg_missing = False
     try:
-        from core.ffmpeg_utils import find_ffmpeg
+        from ghostframe.core.ffmpeg_utils import find_ffmpeg
         ffmpeg_missing = find_ffmpeg() is None
     except Exception:
         ffmpeg_missing = True
 
     cuda_warning = False
     try:
-        from core import settings as cfg
+        from ghostframe.core import settings as cfg
         provider = cfg.get("execution_provider")
         if provider == "cuda":
             import site
@@ -367,7 +364,7 @@ def _global_exception_hook(exc_type, exc_value, exc_tb):
     print(tb, file=sys.stderr)
     try:
         from PyQt5.QtWidgets import QMessageBox
-        from ui.window_chrome import apply_dark_title_bar
+        from ghostframe.ui.window_chrome import apply_dark_title_bar
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Critical)
         msg.setWindowTitle("Error inesperado - GhostFrame Studio")
@@ -399,8 +396,8 @@ def main():
     if os.path.exists(_APP_ICON_PATH):
         app.setWindowIcon(QIcon(_APP_ICON_PATH))
 
-    from ui.main_window import MainWindow
-    from ui.window_chrome import apply_dark_title_bar
+    from ghostframe.ui.main_window import MainWindow
+    from ghostframe.ui.window_chrome import apply_dark_title_bar
     window = MainWindow()
     apply_dark_title_bar(window)
     window.show()

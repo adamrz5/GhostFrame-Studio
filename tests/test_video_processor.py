@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from core.video_processor import censure_roi_inplace, apply_censure
+from ghostframe.core.video_processor import censure_roi_inplace, apply_censure
 
 
 def _frame() -> np.ndarray:

@@ -28,18 +28,19 @@ from PyQt5.QtWidgets import (
     QStyle, QVBoxLayout, QTextBrowser, QWidget,
 )
 
-from core import session as session_mod
-from core import settings as cfg
-from core.face_detector import (
+from ghostframe import ASSETS_DIR, PROJECT_ROOT
+from ghostframe.core import session as session_mod
+from ghostframe.core import settings as cfg
+from ghostframe.core.face_detector import (
     active_model, active_provider, detect_faces, init_detector, gpu_fallback_occurred,
 )
-from core.face_tracker import FaceTracker
-from core.ffmpeg_utils import assert_ffmpeg, find_ffmpeg, probe_video, detect_hardware_encoders
-from core.video_processor import VideoReader, apply_censure, censure_roi_inplace
-from ui.person_card import PERSON_COLORS, PersonCard
-from ui.preview_widget import PreviewWidget
-from ui.timeline_widget import TimelineWidget
-from ui.window_chrome import apply_dark_title_bar
+from ghostframe.core.face_tracker import FaceTracker
+from ghostframe.core.ffmpeg_utils import assert_ffmpeg, find_ffmpeg, probe_video, detect_hardware_encoders
+from ghostframe.core.video_processor import VideoReader, apply_censure, censure_roi_inplace
+from ghostframe.ui.person_card import PERSON_COLORS, PersonCard
+from ghostframe.ui.preview_widget import PreviewWidget
+from ghostframe.ui.timeline_widget import TimelineWidget
+from ghostframe.ui.window_chrome import apply_dark_title_bar
 
 
 # ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -192,7 +193,7 @@ class PlaybackWorker(QObject):
             pass
 
     def run(self) -> None:
-        from ui.playback_manager import AudioPlaybackManager
+        from ghostframe.ui.playback_manager import AudioPlaybackManager
 
         fps   = self.fps
         speed = self.speed
@@ -374,7 +375,7 @@ class WarmupWorker(QObject):
             # can read it from cache without blocking the UI thread (verify_encoder can
             # take several seconds the first time it spawns ffmpeg test processes).
             try:
-                from core.ffmpeg_utils import best_encoder, find_ffmpeg as _ff
+                from ghostframe.core.ffmpeg_utils import best_encoder, find_ffmpeg as _ff
                 ff = _ff()
                 if ff:
                     best_encoder(ff)
@@ -595,8 +596,8 @@ class RenderWorker(QObject):
 
     def run(self):
         try:
-            from core.renderer import render_video
-            from core.ffmpeg_utils import RenderCancelled, assert_ffmpeg, best_encoder
+            from ghostframe.core.renderer import render_video
+            from ghostframe.core.ffmpeg_utils import RenderCancelled, assert_ffmpeg, best_encoder
 
             # ── Detectar y anunciar el encoder ANTES de empezar ───────────────
             ff = assert_ffmpeg(cfg.get("ffmpeg_path") or None)
@@ -830,7 +831,7 @@ class MergePersonsDialog(QDialog):
 
     def _fill_card(self, thumb: QLabel, name_lbl: QLabel, frames_lbl: QLabel,
                    p, idx: int) -> None:
-        from ui.person_card import _bgr_to_pixmap
+        from ghostframe.ui.person_card import _bgr_to_pixmap
         thumb.setPixmap(_bgr_to_pixmap(p.thumbnail, size=72))
         name_lbl.setText(self._pname(p, idx))
         frames_lbl.setText(f"{p.frame_count} frames  ·  ID {p.person_id}")
@@ -1004,8 +1005,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("GhostFrame")
         apply_dark_title_bar(self)
         icon_path = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            "assets",
+            ASSETS_DIR,
             "ghostframe-app-icon.ico",
         )
         if os.path.exists(icon_path):
@@ -1098,8 +1098,7 @@ class MainWindow(QMainWindow):
         )
 
     def _check_mpv_preview_audio(self):
-        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        if not os.path.isfile(os.path.join(root, "libmpv-2.dll")):
+        if not os.path.isfile(os.path.join(PROJECT_ROOT, "libmpv-2.dll")):
             self.status_bar.showMessage(
                 "Aviso: libmpv-2.dll no está junto a main.py; el preview puede reproducirse sin audio. El render conserva audio.",
                 12000,
@@ -1589,14 +1588,13 @@ class MainWindow(QMainWindow):
         import site
         import subprocess
 
-        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        log_path = os.environ.get("GHOSTFRAME_LOG_PATH") or os.path.join(root, "logs", "ghostframe.log")
+        log_path = os.environ.get("GHOSTFRAME_LOG_PATH") or os.path.join(PROJECT_ROOT, "logs", "ghostframe.log")
         lines = [
             "GhostFrame Studio - Diagnostico",
             "=" * 72,
             f"Python: {platform.python_version()}",
             f"Executable: {sys.executable}",
-            f"Proyecto: {root}",
+            f"Proyecto: {PROJECT_ROOT}",
             f"Log: {log_path}",
             "",
             "Configuracion",
@@ -1627,7 +1625,7 @@ class MainWindow(QMainWindow):
         ])
 
         try:
-            from core.ffmpeg_utils import find_ffprobe, get_ffmpeg_version, best_encoder
+            from ghostframe.core.ffmpeg_utils import find_ffprobe, get_ffmpeg_version, best_encoder
             ffmpeg = find_ffmpeg()
             ffprobe = find_ffprobe(ffmpeg)
             lines.extend([
@@ -1701,7 +1699,7 @@ class MainWindow(QMainWindow):
             "",
             "Audio preview / mpv",
             "-" * 72,
-            f"libmpv-2.dll junto a main.py: {'OK' if os.path.isfile(os.path.join(root, 'libmpv-2.dll')) else 'FALTA'}",
+            f"libmpv-2.dll junto a main.py: {'OK' if os.path.isfile(os.path.join(PROJECT_ROOT, 'libmpv-2.dll')) else 'FALTA'}",
             "Si falta, el preview usa reloj interno sin audio; el render final conserva audio.",
             "",
             "Comandos utiles",
@@ -1829,8 +1827,7 @@ class MainWindow(QMainWindow):
         title.setFixedSize(220, 64)
         title.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         logo_path = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            "assets",
+            ASSETS_DIR,
             "ghostframe-logo-topbar.png",
         )
         logo = QPixmap(logo_path)
@@ -2664,8 +2661,7 @@ class MainWindow(QMainWindow):
             )
             return
 
-        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        renders_dir = os.path.join(project_root, "renders")
+        renders_dir = os.path.join(PROJECT_ROOT, "renders")
         os.makedirs(renders_dir, exist_ok=True)
         base_name = os.path.splitext(os.path.basename(self.video_path))[0]
         default_output = os.path.join(renders_dir, f"{base_name}_censored.mp4")
@@ -3022,7 +3018,7 @@ class MainWindow(QMainWindow):
         if self._playing and not self._close_player():
             QMessageBox.warning(self, "Reproducción activa", "No se pudo pausar a tiempo. Inténtalo de nuevo.")
             return
-        from ui.settings_dialog import SettingsDialog
+        from ghostframe.ui.settings_dialog import SettingsDialog
         SettingsDialog(self).exec_()
 
     def _open_batch(self):
@@ -3043,7 +3039,7 @@ class MainWindow(QMainWindow):
             )
             return
         configs = [c.get_config() for c in self.person_cards]
-        from ui.batch_dialog import BatchDialog
+        from ghostframe.ui.batch_dialog import BatchDialog
         BatchDialog(configs, cfg.get("analysis_step"), self).exec_()
 
     @staticmethod

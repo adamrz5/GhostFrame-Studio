@@ -8,9 +8,9 @@ import os
 import uuid
 from typing import Callable
 
-from core import settings as cfg
-from core.ffmpeg_utils import assert_ffmpeg, render_via_pipe
-from core.video_processor import censure_roi_inplace
+from ghostframe.core import settings as cfg
+from ghostframe.core.ffmpeg_utils import assert_ffmpeg, render_via_pipe
+from ghostframe.core.video_processor import censure_roi_inplace
 
 
 def build_process_fn(

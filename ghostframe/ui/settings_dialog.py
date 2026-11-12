@@ -1,5 +1,5 @@
 """
-Diálogo de configuración completo — expone todos los parámetros de core/settings.py.
+Diálogo de configuración completo — expone todos los parámetros de ghostframe/core/settings.py.
 """
 from __future__ import annotations
 
@@ -15,9 +15,9 @@ import ctypes
 import json
 import subprocess
 
-from core import settings as cfg
-from core.ffmpeg_utils import find_ffmpeg, find_ffprobe, get_ffmpeg_version, is_ffmpeg_executable
-from ui.window_chrome import apply_dark_title_bar
+from ghostframe.core import settings as cfg
+from ghostframe.core.ffmpeg_utils import find_ffmpeg, find_ffprobe, get_ffmpeg_version, is_ffmpeg_executable
+from ghostframe.ui.window_chrome import apply_dark_title_bar
 
 
 class RecommendationWorker(QObject):

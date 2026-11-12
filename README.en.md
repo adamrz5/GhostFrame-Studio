@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/ghostframe-app-icon.png" alt="" width="96">
+  <img src="ghostframe/assets/ghostframe-app-icon.png" alt="" width="96">
   <h1>GhostFrame Studio</h1>
   <p>Hide faces in video, one person at a time.</p>
 </div>

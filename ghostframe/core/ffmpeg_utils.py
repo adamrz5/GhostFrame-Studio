@@ -41,6 +41,8 @@ from typing import Callable
 
 import numpy as np
 
+from ghostframe import PROJECT_ROOT
+
 
 class RenderCancelled(RuntimeError):
     """Raised when the user cancels an in-progress render."""
@@ -65,20 +67,19 @@ def find_ffmpeg() -> str | None:
 
     # 3. Carpeta del proyecto — busca ffmpeg.exe en la raíz y en cualquier
     #    subcarpeta ffmpeg*/bin/ (útil si la carpeta está incluida en el repo)
-    _project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     _candidates_relative = []
     try:
-        for entry in os.listdir(_project_root):
-            full = os.path.join(_project_root, entry)
+        for entry in os.listdir(PROJECT_ROOT):
+            full = os.path.join(PROJECT_ROOT, entry)
             if os.path.isdir(full) and "ffmpeg" in entry.lower():
                 _candidates_relative.append(os.path.join(full, "bin", "ffmpeg.exe"))
                 _candidates_relative.append(os.path.join(full, "ffmpeg.exe"))
     except Exception:
         pass
     _candidates_relative += [
-        os.path.join(_project_root, "ffmpeg", "bin", "ffmpeg.exe"),
-        os.path.join(_project_root, "ffmpeg", "ffmpeg.exe"),
-        os.path.join(_project_root, "ffmpeg.exe"),
+        os.path.join(PROJECT_ROOT, "ffmpeg", "bin", "ffmpeg.exe"),
+        os.path.join(PROJECT_ROOT, "ffmpeg", "ffmpeg.exe"),
+        os.path.join(PROJECT_ROOT, "ffmpeg.exe"),
     ]
     for c in _candidates_relative:
         if os.path.isfile(c):

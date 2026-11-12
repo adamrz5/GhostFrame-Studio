@@ -214,7 +214,7 @@ def init_detector(model_name: str = "auto", provider: str = "auto") -> str:
     _limit_cpu_threads()
 
     # ── Intento principal (puede ser GPU) ─────────────────────────────────────
-    from core import settings as cfg
+    from ghostframe.core import settings as cfg
     _det = cfg.get("det_size") or 320
     det_size = (_det, _det)
 
@@ -267,7 +267,7 @@ def _get_app():
             "InsightFace no se inicializó correctamente."
         ) from _detector_init_error
     if _app is None:
-        from core import settings as cfg
+        from ghostframe.core import settings as cfg
         init_detector(
             model_name=cfg.get("model_name"),
             provider=cfg.get("execution_provider"),

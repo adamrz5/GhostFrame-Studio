@@ -3,7 +3,7 @@ from __future__ import annotations
 import time
 from unittest.mock import MagicMock, patch
 
-from ui.playback_manager import AudioPlaybackManager, InternalClock
+from ghostframe.ui.playback_manager import AudioPlaybackManager, InternalClock
 
 
 def test_audio_playback_manager_can_skip_mpv_for_silent_preview():

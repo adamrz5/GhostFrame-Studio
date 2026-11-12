@@ -16,7 +16,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QPixmap, QImage, QPainter, QColor
 
-from core import settings as cfg
+from ghostframe.core import settings as cfg
 
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────

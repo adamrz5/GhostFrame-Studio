@@ -6,8 +6,8 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from core import session as session_mod
-from core.face_tracker import FaceTracker, Person
+from ghostframe.core import session as session_mod
+from ghostframe.core.face_tracker import FaceTracker, Person
 
 
 def _tracker() -> FaceTracker:
